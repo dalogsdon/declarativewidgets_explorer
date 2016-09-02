@@ -254,6 +254,20 @@ Let the user choose a query and display the results in an `urth-viz-table`
         is: 'urth-viz-query',
 
         properties: {
+            columns: {
+                type: Array,
+                persist: true,
+                value: function() { return []; }
+            },
+            columnTypes: {
+                type: Array,
+                persist: true,
+                value: function() { return []; }
+            },
+            lastModifiedQueryIndex: {
+                type: Number,
+                value: NaN
+            },
             /**
              * An array of queries containing either filter or group operations
              */
@@ -261,11 +275,6 @@ Let the user choose a query and display the results in an `urth-viz-table`
                 type: Array,
                 persist: true,
                 value: function() { return []; }
-            },
-
-            lastModifiedQueryIndex: {
-                type: Number,
-                value: NaN
             }
         },
 
@@ -275,7 +284,7 @@ Let the user choose a query and display the results in an `urth-viz-table`
 
         observers: [
             '_queriesChanged(queries.*)',
-            'saveState(queries.*)'
+            'saveState(columns,columnTypes,queries.*)'
         ],
 
         _addAgg: function(event) {
@@ -435,14 +444,14 @@ Let the user choose a query and display the results in an `urth-viz-table`
             dataframe.appendChild(this.$.queries.root);
 
             dataframe.addEventListener('columns-changed', function() {
-                this.columns = dataframe.columns;
+                this.set('columns', dataframe.columns);
                 if (!Number.isNaN(this.lastModifiedQueryIndex)) {
                     this._updateQueryColumns();
                 }
             }.bind(this));
 
             dataframe.addEventListener('column-types-changed', function() {
-                this.columnTypes = dataframe.columnTypes;
+                this.set('columnTypes', dataframe.columnTypes);
                 if (!Number.isNaN(this.lastModifiedQueryIndex)) {
                     this._updateQueryColumnTypes();
                 }
